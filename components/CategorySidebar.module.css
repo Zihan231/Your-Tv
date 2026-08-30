@@ -1,0 +1,248 @@
+.sidebar {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 16px 8px;
+}
+
+.brandLogo {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}
+
+.countrySection {
+  padding: 0 16px 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.dropdownToggle:hover,
+.dropdownToggle:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.selectedLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-right: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.globeIcon {
+  font-size: 14px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  background: transparent;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  max-height: 250px;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+.dropdownSearch {
+  background: #141b2d;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+}
+
+.dropdownList {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  color: var(--text-muted);
+}
+
+.dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+}
+
+.dropdownItemActive {
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.noResults {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+  cursor: default;
+  opacity: 0.5;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.item:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.itemIcon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-right: 10px;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.item:hover .itemIcon,
+.active .itemIcon {
+  color: var(--accent);
+}
+
+.itemName {
+  flex: 1;
+  text-align: left;
+}
+
+.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 600;
+  border-right: 3px solid var(--accent);
+}
+
+.active:hover {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.count {
+  font-size: 11px;
+  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.active .count {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+@media (max-width: 767px) {
+  .brand {
+    display: none;
+  }
+}
