@@ -3,7 +3,119 @@
 import { useState } from 'react';
 import type { Category } from '@/types/iptv';
 import styles from './CategorySidebar.module.css';
-import { FaStar, FaGlobe, FaList, FaFolder } from 'react-icons/fa';
+import {
+  FaStar,
+  FaGlobe,
+  FaList,
+  FaFolder,
+  FaNewspaper,
+  FaTrophy,
+  FaFilm,
+  FaMusic,
+  FaChild,
+  FaHistory,
+  FaGraduationCap,
+  FaTheaterMasks,
+  FaTv,
+  FaHeart,
+  FaPlane,
+  FaPray,
+  FaBriefcase,
+  FaCloudSun,
+  FaShoppingCart,
+  FaCar,
+  FaUtensils,
+  FaMicrochip,
+  FaUsers,
+  FaPalette,
+  FaMapMarkerAlt,
+  FaLandmark,
+  FaGamepad,
+  FaLock,
+  FaCameraRetro,
+  FaTree,
+  FaSpa,
+  FaMousePointer,
+} from 'react-icons/fa';
+
+function getCategoryIcon(id: string, className: string) {
+  switch (id.toLowerCase()) {
+    case 'news':
+      return <FaNewspaper className={className} />;
+    case 'sports':
+      return <FaTrophy className={className} />;
+    case 'movies':
+    case 'movie':
+      return <FaFilm className={className} />;
+    case 'music':
+      return <FaMusic className={className} />;
+    case 'kids':
+    case 'animation':
+      return <FaChild className={className} />;
+    case 'documentary':
+      return <FaHistory className={className} />;
+    case 'education':
+    case 'science':
+      return <FaGraduationCap className={className} />;
+    case 'entertainment':
+      return <FaTheaterMasks className={className} />;
+    case 'comedy':
+      return <FaTv className={className} />;
+    case 'lifestyle':
+      return <FaHeart className={className} />;
+    case 'travel':
+      return <FaPlane className={className} />;
+    case 'religion':
+    case 'religious':
+      return <FaPray className={className} />;
+    case 'business':
+    case 'politics':
+      return <FaBriefcase className={className} />;
+    case 'weather':
+      return <FaCloudSun className={className} />;
+    case 'shop':
+    case 'shopping':
+      return <FaShoppingCart className={className} />;
+    case 'auto':
+      return <FaCar className={className} />;
+    case 'cooking':
+    case 'food':
+      return <FaUtensils className={className} />;
+    case 'technology':
+      return <FaMicrochip className={className} />;
+    case 'family':
+      return <FaUsers className={className} />;
+    case 'general':
+      return <FaTv className={className} />;
+    case 'culture':
+      return <FaPalette className={className} />;
+    case 'local':
+    case 'regional':
+      return <FaMapMarkerAlt className={className} />;
+    case 'legislative':
+      return <FaLandmark className={className} />;
+    case 'series':
+      return <FaFilm className={className} />;
+    case 'hobbies':
+      return <FaGamepad className={className} />;
+    case 'xxx':
+    case 'adult':
+      return <FaLock className={className} />;
+    case 'classic':
+      return <FaCameraRetro className={className} />;
+    case 'outdoor':
+      return <FaTree className={className} />;
+    case 'public':
+      return <FaUsers className={className} />;
+    case 'relax':
+      return <FaSpa className={className} />;
+    case 'interactive':
+      return <FaMousePointer className={className} />;
+    default:
+      return <FaFolder className={className} />;
+  }
+}
+
 
 interface CountryItem {
   code: string;
@@ -143,7 +255,7 @@ export default function CategorySidebar({
             }`}
             onClick={() => onSelect(cat.id)}
           >
-            <FaFolder className={styles.itemIcon} />
+            {getCategoryIcon(cat.id, styles.itemIcon)}
             <span className={styles.itemName}>{cat.name}</span>
             <span className={styles.count}>({c})</span>
           </button>
