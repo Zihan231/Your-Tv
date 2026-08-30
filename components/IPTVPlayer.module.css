@@ -63,7 +63,6 @@
   .playerContainer {
     flex: none;
     height: auto;
-    aspect-ratio: 16 / 9;
     border-bottom: 1px solid var(--border);
     order: 1;
   }
