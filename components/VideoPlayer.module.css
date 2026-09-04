@@ -76,6 +76,28 @@
   border: 1px solid var(--border);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   width: 100%;
+  user-select: none;
+}
+
+.videoArea:fullscreen,
+.videoArea.isFullscreen {
+  border-radius: 0;
+  border: none;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+}
+
+.hideCursor {
+  cursor: none !important;
+}
+
+.hideCursor * {
+  cursor: none !important;
 }
 
 .video {
@@ -84,23 +106,301 @@
   display: block;
   background: #000;
   max-height: 520px;
+  object-fit: contain;
 }
 
+.videoArea:fullscreen .video,
+.videoArea.isFullscreen .video {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: unset;
+}
+
+/* Control Overlay */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.75) 0%,
+    rgba(0, 0, 0, 0) 25%,
+    rgba(0, 0, 0, 0) 65%,
+    rgba(0, 0, 0, 0.88) 100%
+  );
+}
+
+.overlayHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Top bar (channel details overlay in fullscreen or on hover) */
+.topOverlay {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+
+.topTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  margin: 0;
+}
+
+/* Center area (click to play/pause) */
+.centerArea {
+  position: absolute;
+  inset: 60px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.centerSpinner {
+  font-size: 42px;
+  color: var(--accent);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+  pointer-events: none;
+}
+
+.centerPlayIcon {
+  font-size: 44px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.7);
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  animation: popCenter 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popCenter {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Bottom control bar */
+.bottomBar {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.bottomLeft,
+.bottomRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.controlBtn {
+  background: transparent;
+  border: none;
+  color: #f8fafc;
+  font-size: 17px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: background 0.15s ease, transform 0.15s ease;
+  outline: none;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.08);
+}
+
+.controlBtn:active {
+  transform: scale(0.92);
+}
+
+/* Volume Control */
+.volumeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+  cursor: pointer;
+  transition: height 0.15s ease, background 0.15s ease;
+}
+
+.volumeSlider:hover {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease;
+}
+
+.volumeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  background: var(--accent);
+}
+
+.volumeSlider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Live Status Badge */
+.livePill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+  color: #fff;
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--alive);
+  box-shadow: 0 0 8px var(--alive);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+.liveDotError {
+  background: var(--dead);
+  box-shadow: 0 0 8px var(--dead);
+  animation: none;
+}
+
+.liveDotLoading {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+.liveText {
+  letter-spacing: 0.04em;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Quality Select in Overlay */
+.overlaySelect {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(6px);
+}
+
+.overlaySelect:hover,
+.overlaySelect:focus {
+  border-color: var(--accent);
+  background: rgba(15, 23, 42, 0.95);
+}
+
+/* Banner */
 .banner {
   position: absolute;
-  top: 12px;
+  top: 16px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--dead);
   color: #fff;
-  padding: 6px 16px;
-  border-radius: 6px;
+  padding: 8px 18px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+  box-shadow: 0 4px 16px rgba(244, 63, 94, 0.35);
+  z-index: 10;
+  pointer-events: none;
 }
 
+/* Controls below video */
 .controls {
   display: flex;
   align-items: center;
@@ -159,6 +459,62 @@
   gap: 6px;
 }
 
+/* Volume Toast */
+.volumeToast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 14px 22px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 15;
+  animation: toastPop 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+.volumeIcon {
+  font-size: 20px;
+}
+
+.volumeText {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+@keyframes toastPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Mobile optimizations */
 @media (max-width: 767px) {
   .player {
@@ -186,59 +542,12 @@
     width: 100%;
   }
 
-}
-
-.volumeToast {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 20px;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  pointer-events: none;
-  z-index: 10;
-  animation: toastPop 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  color: var(--text);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.volumeIcon {
-  font-size: 20px;
-}
-
-.volumeText {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-@keyframes toastPop {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
+  .volumeSlider {
+    width: 55px;
   }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
 
-.spin {
-  animation: spin 1s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+  .bottomBar {
+    padding: 8px 12px;
+    gap: 8px;
   }
 }
