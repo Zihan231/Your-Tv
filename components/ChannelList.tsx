@@ -68,14 +68,6 @@ export default function ChannelList({
     return 'unknown';
   };
 
-  const quality =
-    allChannels.length > 0
-      ? allChannels[0]?.streams
-          .map((s) => s.quality)
-          .filter((q): q is string => q !== null)
-          .sort((a, b) => (b as string).localeCompare(a as string))[0] ?? ''
-      : '';
-
   return (
     <section className={styles.list}>
       <div className={styles.toolbar}>
@@ -102,6 +94,11 @@ export default function ChannelList({
                   ? styles.dotDead
                   : styles.dotUnknown;
             const isFav = favorites.includes(ch.id);
+            const channelQuality =
+              ch.streams
+                .map((s) => s.quality)
+                .filter((q): q is string => q !== null)
+                .sort((a, b) => b.localeCompare(a))[0] ?? '';
 
             return (
               <div
@@ -135,7 +132,7 @@ export default function ChannelList({
                   <span className={styles.name}>{ch.name}</span>
                   <span className={styles.meta}>
                     {ch.country && <span>{ch.country}</span>}
-                    {quality && <span className={styles.badge}>{quality}</span>}
+                    {channelQuality && <span className={styles.badge}>{channelQuality}</span>}
                   </span>
                 </span>
                 

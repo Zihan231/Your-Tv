@@ -119,3 +119,10 @@ The status checker requires a CORS proxy backend to probe live streams safely wi
 2. Link your repository in your Vercel Dashboard.
 3. Add the `NEXT_PUBLIC_CHECKER_URL` environment variable during the setup stage.
 4. Click **Deploy**.
+
+---
+
+## 🔗 External References
+
+- [beIN Sports HD 2 (Server 4)](https://12.yalla3arab.com/albaplayer/bein-sports-hd-2/?serv=4)
+

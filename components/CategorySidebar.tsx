@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Category } from '@/types/iptv';
 import styles from './CategorySidebar.module.css';
 import {
+  FaFutbol,
   FaStar,
   FaGlobe,
   FaList,
@@ -40,6 +41,8 @@ import {
 
 function getCategoryIcon(id: string, className: string) {
   switch (id.toLowerCase()) {
+    case 'live-events':
+      return <FaFutbol className={className} style={{ color: '#38bdf8' }} />;
     case 'news':
       return <FaNewspaper className={className} />;
     case 'sports':
