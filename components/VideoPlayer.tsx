@@ -71,6 +71,7 @@ export default function VideoPlayer({
     muted: boolean;
   }>({ visible: false, volume: 100, muted: false });
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wakingControlsRef = useRef(false);
 
   // Inactivity auto-hide timer (3.5 seconds)
   const resetIdleTimer = useCallback(() => {
@@ -86,31 +87,91 @@ export default function VideoPlayer({
     }, 3500);
   }, [elemRef, playerStatus]);
 
-  // Handle Fullscreen change listener
+  const handleVideoTouchStart = useCallback(() => {
+    if (!showControls) {
+      wakingControlsRef.current = true;
+    }
+    resetIdleTimer();
+  }, [showControls, resetIdleTimer]);
+
+  // Handle Fullscreen change listener (standard + WebKit/iOS)
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const isFull = !!document.fullscreenElement;
+      const doc = document as any;
+      const video = elemRef.current as any;
+      const isFull =
+        !!doc.fullscreenElement ||
+        !!doc.webkitFullscreenElement ||
+        !!doc.mozFullScreenElement ||
+        !!doc.msFullscreenElement ||
+        !!video?.webkitDisplayingFullscreen;
       setIsFullscreen(isFull);
       resetIdleTimer();
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    const video = elemRef.current as any;
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', handleFullscreenChange);
+      video.addEventListener('webkitendfullscreen', handleFullscreenChange);
+    }
+
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+      if (video) {
+        video.removeEventListener('webkitbeginfullscreen', handleFullscreenChange);
+        video.removeEventListener('webkitendfullscreen', handleFullscreenChange);
+      }
     };
-  }, [resetIdleTimer]);
+  }, [elemRef, resetIdleTimer]);
 
   const toggleFullscreen = useCallback(() => {
-    const container = videoAreaRef.current;
-    if (!container) return;
+    const container = videoAreaRef.current as any;
+    const video = elemRef.current as any;
+    const doc = document as any;
 
-    if (!document.fullscreenElement) {
-      container.requestFullscreen().catch(() => {
-        // Fallback to video tag if container fails
-        elemRef.current?.requestFullscreen().catch(() => {});
-      });
+    const isCurrentFullscreen =
+      !!doc.fullscreenElement ||
+      !!doc.webkitFullscreenElement ||
+      !!doc.mozFullScreenElement ||
+      !!doc.msFullscreenElement ||
+      !!video?.webkitDisplayingFullscreen;
+
+    if (!isCurrentFullscreen) {
+      if (container?.requestFullscreen) {
+        container.requestFullscreen().catch(() => {
+          if (video?.requestFullscreen) {
+            video.requestFullscreen().catch(() => {});
+          } else if (video?.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+          }
+        });
+      } else if (container?.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (video?.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      } else if (video?.requestFullscreen) {
+        video.requestFullscreen().catch(() => {});
+      }
     } else {
-      document.exitFullscreen().catch(() => {});
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => {});
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      } else if (doc.mozCancelFullScreen) {
+        doc.mozCancelFullScreen();
+      } else if (doc.msExitFullscreen) {
+        doc.msExitFullscreen();
+      } else if (video?.webkitExitFullscreen) {
+        video.webkitExitFullscreen();
+      }
     }
   }, [elemRef]);
 
@@ -158,6 +219,14 @@ export default function VideoPlayer({
       video.pause();
     }
   }, [elemRef]);
+
+  const handleCenterClick = useCallback(() => {
+    if (wakingControlsRef.current) {
+      wakingControlsRef.current = false;
+      return;
+    }
+    togglePlay();
+  }, [togglePlay]);
 
   const toggleMute = useCallback(() => {
     const video = elemRef.current;
@@ -443,7 +512,7 @@ export default function VideoPlayer({
         } ${isIdleHidden ? styles.hideCursor : ''}`}
         onMouseMove={resetIdleTimer}
         onMouseDown={resetIdleTimer}
-        onTouchStart={resetIdleTimer}
+        onTouchStart={handleVideoTouchStart}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <video
@@ -477,7 +546,7 @@ export default function VideoPlayer({
           {/* Center clickable area */}
           <div
             className={styles.centerArea}
-            onClick={togglePlay}
+            onClick={handleCenterClick}
             onDoubleClick={toggleFullscreen}
           >
             {playerStatus === 'loading' && (
@@ -604,23 +673,37 @@ export default function VideoPlayer({
         )}
       </div>
 
-      {channel.streams.length > 1 && (
-        <div className={styles.controls}>
-          <label className={styles.label}>Quality</label>
-          <select
-            className={styles.select}
-            value={selectedStreamUrl ?? ''}
-            onChange={(e) => onSwitchStream(e.target.value)}
-          >
-            {channel.streams.map((s) => (
-              <option key={s.url} value={s.url}>
-                {s.quality || 'auto'}
-                {s.label ? ` · ${s.label}` : ''}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div className={styles.controls}>
+        {channel.streams.length > 1 ? (
+          <div className={styles.qualityGroup}>
+            <label className={styles.label}>Quality</label>
+            <select
+              className={styles.select}
+              value={selectedStreamUrl ?? ''}
+              onChange={(e) => onSwitchStream(e.target.value)}
+            >
+              {channel.streams.map((s) => (
+                <option key={s.url} value={s.url}>
+                  {s.quality || 'auto'}
+                  {s.label ? ` · ${s.label}` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className={styles.controlsSpacer} />
+        )}
+
+        <button
+          className={styles.fullscreenBarBtn}
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Exit Fullscreen (F)' : 'Fullscreen (F)'}
+          aria-label={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+        >
+          {isFullscreen ? <FaCompress /> : <FaExpand />}
+          <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+        </button>
+      </div>
 
       {needsHeaders && (
         <div className={styles.note}>
